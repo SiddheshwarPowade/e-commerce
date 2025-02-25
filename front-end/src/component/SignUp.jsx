@@ -49,7 +49,7 @@ const SignUp = () => {
       />
       <input
         className="inputBox"
-        type="text"
+        type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter Email"
