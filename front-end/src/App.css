@@ -88,6 +88,11 @@
   cursor: pointer;
 }
 
+.link {
+  color: #fff;
+  text-decoration: none;
+}
+
 .footer {
   position: absolute;
   bottom: 0;

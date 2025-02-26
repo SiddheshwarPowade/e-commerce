@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../features/userSlice";
 import { setToken } from "../features/tokenSlice";
+import { Controller, useForm } from "react-hook-form";
 
 const SignUp = () => {
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-
   const user = useSelector((state) => state.loginUser);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { handleSubmit, control, formState } = useForm();
+  const { errors } = formState;
 
   React.useEffect(() => {
     if (user.name) {
@@ -20,7 +20,7 @@ const SignUp = () => {
     }
   }, []);
 
-  const collectDetails = async () => {
+  const collectDetails = async ({ name, email, password }) => {
     let result = await fetch("http://localhost:5000/register", {
       method: "post",
       body: JSON.stringify({ name, email, password }),
@@ -40,30 +40,62 @@ const SignUp = () => {
   return (
     <div className="register">
       <h1>Register</h1>
-      <input
-        className="inputBox"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        type="text"
-        placeholder="Enter Name"
-      />
-      <input
-        className="inputBox"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter Email"
-      />
-      <input
-        className="inputBox"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter Password"
-      />
-      <button className="appButton" type="button" onClick={collectDetails}>
-        Sign UP
-      </button>
+      <form onSubmit={handleSubmit(collectDetails)}>
+        <Controller
+          control={control}
+          name="name"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <input
+              className="inputBox"
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.value)}
+              type="text"
+              placeholder="Enter Name"
+            />
+          )}
+        />
+
+        {errors.name && <p className="invalid-input">Enter valid name</p>}
+
+        <Controller
+          control={control}
+          name="email"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <input
+              className="inputBox"
+              type="email"
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.value)}
+              placeholder="Enter Email"
+            />
+          )}
+        />
+
+        {errors.email && <p className="invalid-input">Enter Valid email</p>}
+
+        <Controller
+          control={control}
+          name="password"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <input
+              className="inputBox"
+              type="password"
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.value)}
+              placeholder="Enter Password"
+            />
+          )}
+        />
+
+        {errors.password && (
+          <p className="invalid-input">Enter valid Password</p>
+        )}
+
+        <input className="appButton" type="submit" value="Sign UP" />
+      </form>
     </div>
   );
 };

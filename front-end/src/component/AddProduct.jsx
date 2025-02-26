@@ -1,22 +1,16 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { showSuccessToast } from "../common/Toast";
+import { Controller, useForm } from "react-hook-form";
 
 const AddProduct = () => {
-  const [name, setName] = React.useState("");
-  const [price, setPrice] = React.useState("");
-  const [category, setCategory] = React.useState("");
-  const [company, setCompany] = React.useState("");
-  const [error, setError] = React.useState(false);
-
   const { token } = useSelector((state) => state.token);
   const user = useSelector((state) => state.loginUser);
 
-  const addProduct = async () => {
-    if (!name || !price || !category || !company) {
-      setError(true);
-      return false;
-    }
+  const { handleSubmit, control, formState, reset } = useForm();
+  const { errors } = formState;
 
+  const addProduct = async ({ name, price, category, company }) => {
     let userId = user._id;
     let result = await fetch("http://localhost:5000/add-product", {
       method: "post",
@@ -28,62 +22,83 @@ const AddProduct = () => {
     });
 
     result = await result.json();
-
     if (result.returnCode === 1) {
-      alert("Product added successfully");
-      setName("");
-      setPrice("");
-      setCategory("");
-      setCompany("");
+      showSuccessToast("Product added successfully");
+      reset({ name: "", price: "", category: "", company: "" });
     }
   };
 
   return (
     <div className="product">
       <h1>Add Product</h1>
-      <input
-        className="inputBox"
-        type="text"
-        value={name}
-        placeholder="Enter product name"
-        onChange={(e) => setName(e.target.value)}
-      />
-      {error && !name && (
-        <span className="invalid-input">Enter valid name</span>
-      )}
-      <input
-        className="inputBox"
-        type="text"
-        value={price}
-        placeholder="Enter product price"
-        onChange={(e) => setPrice(e.target.value)}
-      />
-      {error && !price && (
-        <span className="invalid-input">Enter valid price</span>
-      )}
-      <input
-        className="inputBox"
-        type="text"
-        value={category}
-        placeholder="Enter product category"
-        onChange={(e) => setCategory(e.target.value)}
-      />
-      {error && !category && (
-        <span className="invalid-input">Enter valid category</span>
-      )}
-      <input
-        className="inputBox"
-        type="text"
-        value={company}
-        placeholder="Enter product company"
-        onChange={(e) => setCompany(e.target.value)}
-      />
-      {error && !company && (
-        <span className="invalid-input">Enter valid company</span>
-      )}
-      <button onClick={addProduct} className="appButton">
-        Add Product
-      </button>
+      <form onSubmit={handleSubmit(addProduct)}>
+        <Controller
+          control={control}
+          name="name"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <input
+              className="inputBox"
+              type="text"
+              value={field.value}
+              placeholder="Enter product name"
+              onChange={(e) => field.onChange(e.target.value)}
+            />
+          )}
+        />
+        {errors.name && <p className="invalid-input">Enter valid name</p>}
+
+        <Controller
+          control={control}
+          name="price"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <input
+              className="inputBox"
+              type="text"
+              value={field.value}
+              placeholder="Enter product price"
+              onChange={(e) => field.onChange(e.target.value)}
+            />
+          )}
+        />
+        {errors.price && <p className="invalid-input">Enter valid price</p>}
+
+        <Controller
+          control={control}
+          name="category"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <input
+              className="inputBox"
+              type="text"
+              value={field.value}
+              placeholder="Enter product category"
+              onChange={(e) => field.onChange(e.target.value)}
+            />
+          )}
+        />
+        {errors.category && (
+          <p className="invalid-input">Enter valid category</p>
+        )}
+
+        <Controller
+          control={control}
+          name="company"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <input
+              className="inputBox"
+              type="text"
+              value={field.value}
+              placeholder="Enter product company"
+              onChange={(e) => field.onChange(e.target.value)}
+            />
+          )}
+        />
+        {errors.company && <p className="invalid-input">Enter valid company</p>}
+        <input type="submit" className="appButton" value="Add" />
+      </form>
     </div>
   );
 };

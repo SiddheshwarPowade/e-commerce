@@ -1,13 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { showErrorToast, showSuccessToast } from "../common/Toast";
 
 export default function ProductsList() {
   const [products, setProducts] = React.useState([]);
   const { token } = useSelector((state) => state.token);
 
   React.useEffect(() => {
-    console.log(token);
     getProducts();
   }, []);
 
@@ -24,6 +24,7 @@ export default function ProductsList() {
       setProducts(result.data);
     } else {
       setProducts([]);
+      showErrorToast(result.message);
     }
   };
 
@@ -37,10 +38,10 @@ export default function ProductsList() {
 
     result = await result.json();
     if (result.returnCode === 1) {
-      alert("Record is deleted");
+      showSuccessToast("Record is deleted");
       getProducts();
     } else {
-      alert("Something wrong");
+      showErrorToast("Something wrong");
     }
   };
 
@@ -94,10 +95,13 @@ export default function ProductsList() {
                   <td>{product.category}</td>
                   <td>{product.company}</td>
                   <td>
-                    <button onClick={() => deleteProduct(product._id)}>
-                      Delete
-                    </button>
-                    <Link to={`update/${product._id}`}>Update</Link>
+                    <button
+                      className="btn btn-danger fa fa-trash"
+                      onClick={() => deleteProduct(product._id)}
+                    ></button>
+                    <Link to={`update/${product._id}`} className="link">
+                      <span className="btn btn-primary ms-1 fa fa-pencil"></span>
+                    </Link>
                   </td>
                 </tr>
               ))
